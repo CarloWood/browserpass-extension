@@ -34,6 +34,7 @@ function AddEditInterface(settingsModel) {
             stores = [],
             storeTree = new Tree(),
             symbols = true,
+            settingChanged = false, // if true, update settings onremove
             viewSettingsModel = persistSettingsModel;
 
         /**
@@ -232,6 +233,30 @@ function AddEditInterface(settingsModel) {
                     }
                 });
             },
+            onremove: function (vnode) {
+                console.log("onremove handler called for vnode:", settingChanged, vnode);
+                if (settingChanged) {
+                    const storeId = Login.prototype.getStore(loginObj, "id");
+                    let _stores = JSON.parse(localStorage.getItem("stores"));
+                    console.log(storeId, _stores);
+                    if (_stores.hasOwnProperty(storeId)) {
+                        _stores[storeId].includeSymbols = Boolean(symbols);
+                        _stores[storeId].passwordLength = parseInt(passwordLength);
+                        console.log(
+                            "updating store settings (includeSymbols, passwordLength) for store:",
+                            storeId,
+                            _stores[storeId].includeSymbols,
+                            _stores[storeId].passwordLength
+                        );
+                        try {
+                            localStorage.setItem("stores", JSON.stringify(_stores));
+                        } catch (error) {
+                            // just continue and do nothing with error
+                            console.log(error);
+                        }
+                    }
+                }
+            },
             oninit: async function (vnode) {
                 tmpLogin = layout.getCurrentLogin();
                 settings = await viewSettingsModel.get();
@@ -333,6 +358,14 @@ function AddEditInterface(settingsModel) {
             setPasswordLength: function (length) {
                 passwordLength = length > 0 ? length : 1;
                 autoUpdatePassword();
+                if (!editing) {
+                    settingChanged = true;
+                    // set default password length for current password-store
+                    // let _stores = localStorage.getItem("stores");
+                    // console.log(typeof _stores, _stores);
+                    // _obj = JSON.parse(_stores);
+                    // console.log(typeof _obj, _obj);
+                }
             },
             /**
              * Update login raw text and secret when "raw text" changes.
@@ -380,6 +413,9 @@ function AddEditInterface(settingsModel) {
                 } else {
                     storePath = "~/.password-store";
                 }
+                passwordLength =
+                    Login.prototype.getStore(loginObj, "passwordLength") || passwordLength;
+                symbols = Login.prototype.getStore(loginObj, "includeSymbols") || symbols;
             },
             /**
              * Toggle checked on/off, determines if symbols
@@ -393,6 +429,9 @@ function AddEditInterface(settingsModel) {
             setSymbols: function (checked) {
                 symbols = checked;
                 autoUpdatePassword();
+                if (!editing) {
+                    settingChanged = true;
+                }
             },
             /**
              * Mithril component view

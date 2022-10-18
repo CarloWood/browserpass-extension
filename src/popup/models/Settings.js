@@ -1,6 +1,7 @@
 "use strict";
 
 require("chrome-extension-async");
+const helpers = require("../../helpers");
 
 /**
  * Settings Constructor()
@@ -101,21 +102,8 @@ Settings.prototype.get = async function () {
 Settings.prototype.getStore = function (settingsObj, property = "") {
     let
         store = (settingsObj.hasOwnProperty("store")) ? settingsObj.store : {},
-        value = null
+        value = helpers.getStoreProperty(store, property)
     ;
-
-    switch (property) {
-        case "color":
-        case "bgColor":
-            if (store.hasOwnProperty(property)) {
-                value = store[property];
-            }
-            break;
-
-        default:
-            value = store;
-            break;
-    }
 
     return value;
 }

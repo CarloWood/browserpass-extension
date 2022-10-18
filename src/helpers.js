@@ -28,6 +28,7 @@ module.exports = {
     LATEST_NATIVE_APP_VERSION,
     deepCopy,
     filterSortLogins,
+    getStoreProperty,
     handleError,
     highlight,
     ignoreFiles,
@@ -528,4 +529,38 @@ function sortUnique(array, comparator) {
     return array
         .sort(comparator)
         .filter((elem, index, arr) => index == !arr.length || arr[index - 1] != elem);
+}
+
+/**
+ * Handler for retrieving password "store" property values
+ *
+ * @since X.Y.Z
+ *
+ *
+ */
+function getStoreProperty(store = {}, property = "") {
+    let value = null;
+    if (store.hasOwnProperty(property)) {
+        value = store[property];
+    }
+
+    switch (property) {
+        case "color":
+        case "bgColor":
+            // nothing more to do
+            break;
+        case "symbols":
+        case "includeSymbols":
+            value = Boolean(value);
+            break;
+        case "passwordLength":
+            if (!value) {
+                value = 16;
+            } else {
+                value = parseInt(value);
+            }
+            break;
+    }
+
+    return value;
 }

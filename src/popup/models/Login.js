@@ -255,23 +255,10 @@ function getSecretDetails(text = "") {
 Login.prototype.getStore = function(login, property = "") {
     let
         settingsValue = Settings.prototype.getStore(login.settings, property),
-        store = (login.hasOwnProperty("store")) ? login.store : {},
-        value = null
+        store = (login.hasOwnProperty("store")) ? login.store : {}
     ;
 
-    switch (property) {
-        case "color":
-        case "bgColor":
-            if (store.hasOwnProperty(property)) {
-                value = store[property];
-            }
-            break;
-
-        default:
-            break;
-    }
-
-    return value || settingsValue;
+    return helpers.getStoreProperty(store, property) || settingsValue;
 }
 
 /**
