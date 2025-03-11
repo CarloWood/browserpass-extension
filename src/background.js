@@ -110,7 +110,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         console.debug("keepAlive fired", { current, lastCopiedText });
         // stop if either value changes
         if (current === lastCopiedText) {
-            await keepAlive()
+            await keepAlive();
         }
     }
 });
@@ -210,7 +210,7 @@ async function copyToClipboard(text, clear = true) {
     if (clear) {
         lastCopiedText = text;
         chrome.alarms.create("clearClipboard", { delayInMinutes: 1 });
-        await keepAlive()
+        await keepAlive();
     }
 }
 
